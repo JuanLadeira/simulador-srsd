@@ -7,15 +7,16 @@ Este guia explica como instalar, configurar, executar e testar o simulador SRSD.
 ## Índice
 
 1. [Instalação](#instalação)
-2. [Execução Rápida](#execução-rápida)
-3. [Comandos Disponíveis](#comandos-disponíveis)
-4. [Cenários de Teste](#cenários-de-teste)
-5. [Criando Cenários Personalizados](#criando-cenários-personalizados)
-6. [Executando Testes](#executando-testes)
-7. [Interpretando Resultados](#interpretando-resultados)
-8. [Validação de Hipóteses](#validação-de-hipóteses)
-9. [Uso Programático](#uso-programático)
-10. [Troubleshooting](#troubleshooting)
+2. [Comandos Rápidos (taskipy)](#comandos-rápidos-taskipy)
+3. [Execução Rápida](#execução-rápida)
+4. [Comandos Disponíveis](#comandos-disponíveis)
+5. [Cenários de Teste](#cenários-de-teste)
+6. [Criando Cenários Personalizados](#criando-cenários-personalizados)
+7. [Executando Testes](#executando-testes)
+8. [Interpretando Resultados](#interpretando-resultados)
+9. [Validação de Hipóteses](#validação-de-hipóteses)
+10. [Uso Programático](#uso-programático)
+11. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -57,6 +58,67 @@ python -c "from src.core import NetworkGraph; print('OK')"
 
 ---
 
+## Comandos Rápidos (taskipy)
+
+O projeto usa **taskipy** para simplificar a execução de comandos. Após instalar as dependências, use `task <comando>`:
+
+### Referência Rápida
+
+```bash
+# Ver todos os comandos disponíveis
+task help
+```
+
+### Execução
+
+| Comando | Descrição |
+|---------|-----------|
+| `task demo` | Executa demonstração rápida |
+| `task run` | Executa o simulador |
+| `task list` | Lista cenários disponíveis |
+| `task all` | Executa todos os cenários |
+| `task validate` | Valida hipóteses H1 e H2 |
+
+### Cenários Específicos
+
+| Comando | Descrição |
+|---------|-----------|
+| `task small` | Executa cenário small_mesh (4x4, 500 fluxos) |
+| `task medium` | Executa cenário medium_scalefree (50 nós) |
+| `task large` | Executa cenário large_scale (100 nós) |
+| `task qkd` | Executa cenário com QKD |
+| `task adversary` | Executa cenário focado em adversário |
+| `task scenario <nome>` | Executa cenário específico |
+
+### Testes
+
+| Comando | Descrição |
+|---------|-----------|
+| `task test` | Executa todos os testes |
+| `task test-fast` | Testes rápidos (para no primeiro erro) |
+| `task test-cov` | Testes com cobertura de código |
+| `task test-core` | Testes do módulo core |
+| `task test-routing` | Testes do módulo routing |
+| `task test-adversary` | Testes do módulo adversary |
+| `task test-simulation` | Testes do módulo simulation |
+
+### Qualidade de Código
+
+| Comando | Descrição |
+|---------|-----------|
+| `task fmt` | Formata código (black + isort) |
+| `task check` | Verifica formatação |
+| `task lint` | Análise estática (mypy) |
+
+### Limpeza
+
+| Comando | Descrição |
+|---------|-----------|
+| `task clean` | Remove arquivos temporários (__pycache__, etc) |
+| `task clean-results` | Remove resultados de experimentos |
+
+---
+
 ## Execução Rápida
 
 ### Demo Básica
@@ -64,6 +126,8 @@ python -c "from src.core import NetworkGraph; print('OK')"
 O comando mais simples para ver o simulador em ação:
 
 ```bash
+task demo
+# ou
 python main.py
 ```
 

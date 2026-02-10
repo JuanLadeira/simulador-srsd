@@ -1,0 +1,114 @@
+[project]
+name = "simulador-srsd"
+version = "0.1.0"
+description = "Simulador de rede para validação do SRSD (Sistema de Roteamento Seguro Distribuído)"
+authors = [
+    {name = "SRSD Research Team"}
+]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "networkx>=3.0",
+    "numpy>=1.24.0",
+    "pandas>=2.0.0",
+    "PyYAML>=6.0",
+    "matplotlib>=3.7.0",
+    "seaborn>=0.12.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "taskipy>=1.12.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "mypy>=1.0.0",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.taskipy.tasks]
+# ============================================
+# EXECUÇÃO
+# ============================================
+demo = "python main.py --demo"
+run = "python main.py"
+list = "python main.py --list"
+validate = "python main.py --validate"
+all = "python main.py --all"
+
+# Cenários específicos
+scenario = "python main.py --scenario"
+small = "python main.py --scenario small_mesh"
+medium = "python main.py --scenario medium_scalefree"
+large = "python main.py --scenario large_scale"
+qkd = "python main.py --scenario qkd_network"
+adversary = "python main.py --scenario adversary_test"
+
+# ============================================
+# TESTES
+# ============================================
+test = "pytest tests/ -v"
+test-cov = "pytest tests/ --cov=src --cov-report=html --cov-report=term"
+test-core = "pytest tests/test_core.py -v"
+test-routing = "pytest tests/test_routing.py -v"
+test-adversary = "pytest tests/test_adversary.py -v"
+test-simulation = "pytest tests/test_simulation.py -v"
+test-fast = "pytest tests/ -v -x --tb=short"
+
+# ============================================
+# QUALIDADE DE CÓDIGO
+# ============================================
+fmt = "black src/ tests/ main.py && isort src/ tests/ main.py"
+check = "black --check src/ tests/ main.py && isort --check src/ tests/ main.py"
+lint = "mypy src/ --ignore-missing-imports"
+
+# ============================================
+# LIMPEZA
+# ============================================
+clean = "find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null; find . -type d -name .pytest_cache -exec rm -rf {} + 2>/dev/null; find . -type d -name htmlcov -exec rm -rf {} + 2>/dev/null; find . -type f -name '*.pyc' -delete 2>/dev/null; echo 'Limpeza concluída!'"
+clean-results = "rm -rf data/results/*.json && echo 'Resultados removidos!'"
+
+# ============================================
+# UTILIDADES
+# ============================================
+help = "echo '\\n=== SRSD Simulator - Comandos Disponíveis ===\\n\\n--- Execução ---\\ntask demo          Executa demonstração rápida\\ntask run           Executa o simulador (mesmo que demo)\\ntask list          Lista cenários disponíveis\\ntask all           Executa todos os cenários\\ntask validate      Valida hipóteses H1 e H2\\n\\n--- Cenários ---\\ntask small         Executa cenário small_mesh\\ntask medium        Executa cenário medium_scalefree\\ntask large         Executa cenário large_scale\\ntask qkd           Executa cenário qkd_network\\ntask adversary     Executa cenário adversary_test\\ntask scenario X    Executa cenário específico X\\n\\n--- Testes ---\\ntask test          Executa todos os testes\\ntask test-cov      Testes com cobertura de código\\ntask test-fast     Testes rápidos (para no primeiro erro)\\ntask test-core     Testes do módulo core\\ntask test-routing  Testes do módulo routing\\ntask test-adversary Testes do módulo adversary\\ntask test-simulation Testes do módulo simulation\\n\\n--- Qualidade ---\\ntask fmt           Formata código (black + isort)\\ntask check         Verifica formatação\\ntask lint          Análise estática (mypy)\\n\\n--- Limpeza ---\\ntask clean         Remove arquivos temporários\\ntask clean-results Remove resultados de experimentos\\n'"
+
+[tool.black]
+line-length = 100
+target-version = ['py311']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+    | \.mypy_cache
+    | \.pytest_cache
+    | __pycache__
+    | venv
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 100
+skip = [".git", "venv", "__pycache__"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_functions = "test_*"
+addopts = "-v --tb=short"
+
+[tool.coverage.run]
+source = ["src"]
+omit = ["*/__pycache__/*", "*/tests/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+]
