@@ -1,0 +1,247 @@
+# SRSD Simulator - Scenario Configurations
+# =========================================
+#
+# This file defines scenarios for validating the SRSD hypotheses:
+# H1: Structural routing predictability is an exploitable vulnerability
+# H2: SRSD with QKD reduces vulnerability without significant performance loss
+
+# Scenario 1: Small mesh for basic validation
+small_mesh:
+  name: small_mesh
+  description: "Small 4x4 mesh network for basic SRSD validation"
+
+  topology:
+    type: mesh
+    rows: 4
+    cols: 4
+    bidirectional: true
+    qkd_enabled: false
+    seed: 42
+
+  traffic:
+    pattern: uniform
+    num_flows: 500
+    flow_rate: 10.0
+    seed: 42
+
+  experiment:
+    name: small_mesh_test
+    duration: 50.0
+    warmup: 5.0
+    test_baseline: true
+    test_srsd: true
+    test_srsd_qkd: false
+    srsd_k_paths: 3
+    srsd_recurrence_penalty: 2.0
+    output_dir: data/results
+
+# Scenario 2: Medium scale-free network (Internet-like)
+medium_scalefree:
+  name: medium_scalefree
+  description: "Medium Barabasi-Albert network simulating Internet topology"
+
+  topology:
+    type: barabasi_albert
+    num_nodes: 50
+    ba_m: 3
+    bidirectional: true
+    qkd_enabled: false
+    seed: 42
+
+  traffic:
+    pattern: hotspot
+    num_flows: 1000
+    flow_rate: 20.0
+    hotspot_nodes: 5
+    hotspot_concentration: 0.6
+    seed: 42
+
+  experiment:
+    name: scalefree_hotspot
+    duration: 100.0
+    warmup: 10.0
+    test_baseline: true
+    test_srsd: true
+    srsd_k_paths: 5
+    srsd_recurrence_penalty: 2.5
+    output_dir: data/results
+
+# Scenario 3: Small-world network (Watts-Strogatz)
+small_world:
+  name: small_world
+  description: "Watts-Strogatz small-world network"
+
+  topology:
+    type: watts_strogatz
+    num_nodes: 40
+    ws_k: 4
+    ws_p: 0.15
+    bidirectional: true
+    qkd_enabled: false
+    seed: 42
+
+  traffic:
+    pattern: realistic
+    num_flows: 800
+    flow_rate: 15.0
+    seed: 42
+
+  experiment:
+    name: small_world_realistic
+    duration: 80.0
+    warmup: 8.0
+    test_baseline: true
+    test_srsd: true
+    srsd_k_paths: 4
+    output_dir: data/results
+
+# Scenario 4: QKD-enabled network
+qkd_network:
+  name: qkd_network
+  description: "Network with partial QKD coverage for H2 validation"
+
+  topology:
+    type: barabasi_albert
+    num_nodes: 30
+    ba_m: 2
+    bidirectional: true
+    qkd_enabled: true
+    qkd_coverage: 0.4
+    seed: 42
+
+  traffic:
+    pattern: uniform
+    num_flows: 600
+    flow_rate: 12.0
+    seed: 42
+
+  experiment:
+    name: qkd_integration
+    duration: 60.0
+    warmup: 6.0
+    test_baseline: true
+    test_srsd: true
+    test_srsd_qkd: true
+    srsd_k_paths: 4
+    srsd_recurrence_penalty: 2.0
+    output_dir: data/results
+
+# Scenario 5: Large-scale stress test
+large_scale:
+  name: large_scale
+  description: "Large network for stress testing and scalability"
+
+  topology:
+    type: barabasi_albert
+    num_nodes: 100
+    ba_m: 4
+    bidirectional: true
+    qkd_enabled: false
+    seed: 42
+
+  traffic:
+    pattern: realistic
+    num_flows: 5000
+    flow_rate: 50.0
+    seed: 42
+
+  experiment:
+    name: large_scale_test
+    duration: 200.0
+    warmup: 20.0
+    test_baseline: true
+    test_srsd: true
+    srsd_k_paths: 5
+    srsd_recurrence_penalty: 3.0
+    output_dir: data/results
+
+# Scenario 6: Adversary analysis focus
+adversary_test:
+  name: adversary_test
+  description: "Scenario optimized for adversary analysis"
+
+  topology:
+    type: mesh
+    rows: 5
+    cols: 5
+    bidirectional: true
+    qkd_enabled: false
+    seed: 42
+
+  traffic:
+    pattern: sequential  # Predictable pattern for adversary testing
+    num_flows: 1000
+    flow_rate: 25.0
+    seed: 42
+
+  experiment:
+    name: adversary_analysis
+    duration: 80.0
+    warmup: 5.0
+    test_baseline: true
+    test_srsd: true
+    srsd_k_paths: 5
+    srsd_recurrence_penalty: 3.0
+    srsd_temperature: 0.8
+    output_dir: data/results
+
+# Scenario 7: Burst traffic pattern
+burst_traffic:
+  name: burst_traffic
+  description: "Network under burst traffic patterns"
+
+  topology:
+    type: watts_strogatz
+    num_nodes: 35
+    ws_k: 6
+    ws_p: 0.2
+    bidirectional: true
+    qkd_enabled: false
+    seed: 42
+
+  traffic:
+    pattern: burst
+    num_flows: 1200
+    flow_rate: 30.0
+    burst_size: 20
+    burst_interval: 2.0
+    seed: 42
+
+  experiment:
+    name: burst_traffic_test
+    duration: 120.0
+    warmup: 10.0
+    test_baseline: true
+    test_srsd: true
+    srsd_k_paths: 4
+    output_dir: data/results
+
+# Scenario 8: Full QKD coverage
+full_qkd:
+  name: full_qkd
+  description: "Network with full QKD coverage"
+
+  topology:
+    type: mesh
+    rows: 4
+    cols: 4
+    bidirectional: true
+    qkd_enabled: true
+    qkd_coverage: 1.0
+    seed: 42
+
+  traffic:
+    pattern: uniform
+    num_flows: 400
+    flow_rate: 10.0
+    seed: 42
+
+  experiment:
+    name: full_qkd_test
+    duration: 40.0
+    warmup: 4.0
+    test_baseline: true
+    test_srsd: true
+    test_srsd_qkd: true
+    srsd_k_paths: 3
+    output_dir: data/results

@@ -1,0 +1,40 @@
+{
+  "name": "simple_mesh_3x3",
+  "nodes": [
+    {"id": "n_0_0", "node_type": "router", "state": "active", "x": 0, "y": 0},
+    {"id": "n_0_1", "node_type": "router", "state": "active", "x": 100, "y": 0},
+    {"id": "n_0_2", "node_type": "router", "state": "active", "x": 200, "y": 0},
+    {"id": "n_1_0", "node_type": "router", "state": "active", "x": 0, "y": 100},
+    {"id": "n_1_1", "node_type": "router", "state": "active", "x": 100, "y": 100},
+    {"id": "n_1_2", "node_type": "router", "state": "active", "x": 200, "y": 100},
+    {"id": "n_2_0", "node_type": "router", "state": "active", "x": 0, "y": 200},
+    {"id": "n_2_1", "node_type": "router", "state": "active", "x": 100, "y": 200},
+    {"id": "n_2_2", "node_type": "router", "state": "active", "x": 200, "y": 200}
+  ],
+  "edges": [
+    {"source": "n_0_0", "target": "n_0_1", "attributes": {"weight": 1.0, "latency": 5.0}},
+    {"source": "n_0_1", "target": "n_0_0", "attributes": {"weight": 1.0, "latency": 5.0}},
+    {"source": "n_0_1", "target": "n_0_2", "attributes": {"weight": 1.0, "latency": 5.0}},
+    {"source": "n_0_2", "target": "n_0_1", "attributes": {"weight": 1.0, "latency": 5.0}},
+    {"source": "n_0_0", "target": "n_1_0", "attributes": {"weight": 1.0, "latency": 5.0}},
+    {"source": "n_1_0", "target": "n_0_0", "attributes": {"weight": 1.0, "latency": 5.0}},
+    {"source": "n_0_1", "target": "n_1_1", "attributes": {"weight": 1.0, "latency": 5.0}},
+    {"source": "n_1_1", "target": "n_0_1", "attributes": {"weight": 1.0, "latency": 5.0}},
+    {"source": "n_0_2", "target": "n_1_2", "attributes": {"weight": 1.0, "latency": 5.0}},
+    {"source": "n_1_2", "target": "n_0_2", "attributes": {"weight": 1.0, "latency": 5.0}},
+    {"source": "n_1_0", "target": "n_1_1", "attributes": {"weight": 1.0, "latency": 5.0}},
+    {"source": "n_1_1", "target": "n_1_0", "attributes": {"weight": 1.0, "latency": 5.0}},
+    {"source": "n_1_1", "target": "n_1_2", "attributes": {"weight": 1.0, "latency": 5.0}},
+    {"source": "n_1_2", "target": "n_1_1", "attributes": {"weight": 1.0, "latency": 5.0}},
+    {"source": "n_1_0", "target": "n_2_0", "attributes": {"weight": 1.0, "latency": 5.0}},
+    {"source": "n_2_0", "target": "n_1_0", "attributes": {"weight": 1.0, "latency": 5.0}},
+    {"source": "n_1_1", "target": "n_2_1", "attributes": {"weight": 1.0, "latency": 5.0}},
+    {"source": "n_2_1", "target": "n_1_1", "attributes": {"weight": 1.0, "latency": 5.0}},
+    {"source": "n_1_2", "target": "n_2_2", "attributes": {"weight": 1.0, "latency": 5.0}},
+    {"source": "n_2_2", "target": "n_1_2", "attributes": {"weight": 1.0, "latency": 5.0}},
+    {"source": "n_2_0", "target": "n_2_1", "attributes": {"weight": 1.0, "latency": 5.0}},
+    {"source": "n_2_1", "target": "n_2_0", "attributes": {"weight": 1.0, "latency": 5.0}},
+    {"source": "n_2_1", "target": "n_2_2", "attributes": {"weight": 1.0, "latency": 5.0}},
+    {"source": "n_2_2", "target": "n_2_1", "attributes": {"weight": 1.0, "latency": 5.0}}
+  ]
+}
