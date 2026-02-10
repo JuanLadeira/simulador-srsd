@@ -1,0 +1,63 @@
+{
+  "scenario_name": "adversary_test",
+  "timestamp": "2026-02-10T15:41:34.712996",
+  "duration": 0.3193657398223877,
+  "results": {
+    "baseline": {
+      "algorithm": "baseline",
+      "total_time": 0.011778116226196289,
+      "successful_flows": 1000,
+      "failed_flows": 0,
+      "avg_latency": 1.92,
+      "avg_hops": 1.92,
+      "path_entropy": 4.643856189774723,
+      "unique_paths": 25,
+      "adversary_correlation": 0.0,
+      "adversary_identification": 0.0
+    },
+    "srsd": {
+      "algorithm": "srsd",
+      "total_time": 0.30385470390319824,
+      "successful_flows": 1000,
+      "failed_flows": 0,
+      "avg_latency": 2.022,
+      "avg_hops": 2.022,
+      "path_entropy": 4.845050292461155,
+      "unique_paths": 36,
+      "adversary_correlation": 0.0,
+      "adversary_identification": 0.0
+    }
+  },
+  "comparison": {
+    "baseline_vs_srsd": {
+      "entropy_improvement_pct": 4.332479182482886,
+      "diversity_improvement_pct": 44.0,
+      "latency_overhead_pct": 5.312499999999994,
+      "baseline_entropy": 4.643856189774723,
+      "srsd_entropy": 4.845050292461155,
+      "baseline_unique_paths": 25,
+      "srsd_unique_paths": 36
+    },
+    "adversary": {
+      "correlation": {
+        "baseline_accuracy": 0.975,
+        "srsd_accuracy": 0.975,
+        "improvement": 0.0
+      },
+      "fingerprinting": {
+        "baseline_identification_rate": 1.0,
+        "srsd_identification_rate": 1.0,
+        "improvement": 0.0
+      },
+      "predictability": {
+        "baseline_entropy": 0.0,
+        "srsd_entropy": 0.20119410268643123,
+        "entropy_improvement": 0.20119410268643123,
+        "baseline_recurrence": 1.0,
+        "srsd_recurrence": 0.9420000000000001,
+        "recurrence_reduction": 0.05799999999999994
+      }
+    }
+  },
+  "data_files": {}
+}
