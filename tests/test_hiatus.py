@@ -53,9 +53,13 @@ class TestHiatusController:
 
     def test_mixing_delay_added(self):
         """Hiatus deve adicionar delay de mixing."""
+        # Packet needs 2 layers: current (this Hiatus) and next destination
         packet = Packet(
             packet_id="p1",
-            layers=[EncryptedLayer("dest", True)]
+            layers=[
+                EncryptedLayer("hiatus1", False),  # Current layer
+                EncryptedLayer("dest", True)        # Next layer (to be revealed)
+            ]
         )
 
         controller = HiatusController("hiatus1", mixing_delay_mean=0.1, seed=42)
@@ -90,9 +94,13 @@ class TestHiatusController:
         controller = HiatusController("hiatus1", seed=42)
 
         for i in range(5):
+            # Packet needs 2 layers for proper processing
             packet = Packet(
                 packet_id=f"p{i}",
-                layers=[EncryptedLayer("dest", True)]
+                layers=[
+                    EncryptedLayer("hiatus1", False),  # Current layer
+                    EncryptedLayer("dest", True)       # Next layer (final)
+                ]
             )
             controller.process_packet(packet)
 
@@ -226,24 +234,22 @@ class TestPacketWithHiatus:
             final_destination="dest"
         )
 
-        # First peel: h1
+        # Initially at layer 0, visible destination is h1
+        assert packet.get_current_segment_destination() == "h1"
+
+        # First peel at h1 reveals next destination: h2
         info1 = packet.peel_layer()
-        assert info1.segment_destination == "h1"
+        assert info1.segment_destination == "h2"
         assert info1.is_final is False
 
-        # Second peel: h2
+        # Second peel at h2 reveals next destination: dest (final)
         info2 = packet.peel_layer()
-        assert info2.segment_destination == "h2"
-        assert info2.is_final is False
+        assert info2.segment_destination == "dest"
+        assert info2.is_final is True
 
-        # Third peel: dest (final)
+        # No more layers to peel
         info3 = packet.peel_layer()
-        assert info3.segment_destination == "dest"
-        assert info3.is_final is True
-
-        # No more layers
-        info4 = packet.peel_layer()
-        assert info4 is None
+        assert info3 is None
 
     def test_packet_hides_origin_destination(self):
         """Pacote deve ocultar origem e destino."""
