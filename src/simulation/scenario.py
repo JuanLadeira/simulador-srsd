@@ -63,9 +63,9 @@ class TopologyConfig:
     bidirectional: bool = True
     seed: Optional[int] = None
 
-    # QKD configuration
-    qkd_enabled: bool = False
-    qkd_coverage: float = 0.5  # Fraction of edges with QKD
+    # QKD configuration (mandatory by default per SRSD spec)
+    qkd_enabled: bool = True  # QKD is mandatory in SRSD
+    qkd_coverage: float = 1.0  # Full QKD coverage by default
 
 
 @dataclass
@@ -105,10 +105,16 @@ class ExperimentConfig:
     test_srsd: bool = True
     test_srsd_qkd: bool = False
 
-    # SRSD parameters
+    # SRSD parameters (legacy mode)
     srsd_k_paths: int = 5
     srsd_recurrence_penalty: float = 2.0
     srsd_temperature: float = 1.0
+
+    # Distributed SRSD parameters (new compliant mode)
+    use_distributed_srsd: bool = True  # Use new distributed implementation
+    num_hiatus: int = 3  # Number of Hiatus (CAR) nodes
+    hiatus_placement: str = "random"  # Strategy: "random", "betweenness", "degree"
+    blocking_window: int = 3  # Drawer blocking window
 
     # Metrics collection
     collect_per_flow: bool = True
@@ -323,6 +329,10 @@ class Scenario:
                 'test_srsd_qkd': self.experiment.test_srsd_qkd,
                 'srsd_k_paths': self.experiment.srsd_k_paths,
                 'srsd_recurrence_penalty': self.experiment.srsd_recurrence_penalty,
+                'use_distributed_srsd': self.experiment.use_distributed_srsd,
+                'num_hiatus': self.experiment.num_hiatus,
+                'hiatus_placement': self.experiment.hiatus_placement,
+                'blocking_window': self.experiment.blocking_window,
                 'output_dir': self.experiment.output_dir,
                 'seed': self.experiment.seed,
             },
@@ -369,6 +379,10 @@ class Scenario:
             test_srsd_qkd=exp_data.get('test_srsd_qkd', False),
             srsd_k_paths=exp_data.get('srsd_k_paths', 5),
             srsd_recurrence_penalty=exp_data.get('srsd_recurrence_penalty', 2.0),
+            use_distributed_srsd=exp_data.get('use_distributed_srsd', True),
+            num_hiatus=exp_data.get('num_hiatus', 3),
+            hiatus_placement=exp_data.get('hiatus_placement', 'random'),
+            blocking_window=exp_data.get('blocking_window', 3),
             output_dir=exp_data.get('output_dir', 'data/results'),
             seed=exp_data.get('seed'),
         )

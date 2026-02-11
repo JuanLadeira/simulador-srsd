@@ -156,9 +156,16 @@ class SimulationRunner:
 
         if self.scenario.experiment.test_srsd:
             config = SRSDConfig(
+                # Legacy mode parameters
                 k_paths=self.scenario.experiment.srsd_k_paths,
                 recurrence_penalty=self.scenario.experiment.srsd_recurrence_penalty,
                 selection_temperature=self.scenario.experiment.srsd_temperature,
+                # Distributed mode parameters
+                use_distributed=self.scenario.experiment.use_distributed_srsd,
+                num_hiatus=self.scenario.experiment.num_hiatus,
+                hiatus_placement=self.scenario.experiment.hiatus_placement,
+                blocking_window=self.scenario.experiment.blocking_window,
+                seed=self.scenario.experiment.seed,
             )
             self.srsd_router = SRSDRouter(self.graph, config)
             if self.scenario.experiment.seed:
@@ -169,10 +176,16 @@ class SimulationRunner:
             self._init_qkd()
 
         if self.scenario.experiment.test_srsd_qkd and self.qkd_manager:
+            # Note: QKD should NOT influence routing per SRSD spec
+            # QKDIntegratedSRSDRouter now sets use_qkd_indicators=False
             config = SRSDConfig(
                 k_paths=self.scenario.experiment.srsd_k_paths,
                 recurrence_penalty=self.scenario.experiment.srsd_recurrence_penalty,
-                use_qkd_indicators=True,
+                use_distributed=self.scenario.experiment.use_distributed_srsd,
+                num_hiatus=self.scenario.experiment.num_hiatus,
+                hiatus_placement=self.scenario.experiment.hiatus_placement,
+                blocking_window=self.scenario.experiment.blocking_window,
+                seed=self.scenario.experiment.seed,
             )
             self.qkd_srsd_router = QKDIntegratedSRSDRouter(
                 self.graph, config, self.qkd_manager
