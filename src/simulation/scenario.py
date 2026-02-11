@@ -121,6 +121,11 @@ class ExperimentConfig:
     collect_per_second: bool = True
     sample_rate: float = 1.0  # Fraction of flows to fully track
 
+    # Predictive adversary
+    use_predictive_adversary: bool = False
+    predictive_history_size: int = 5
+    predictive_training_ratio: float = 0.7
+
     # Output
     output_dir: str = "data/results"
     save_flows: bool = False
@@ -383,6 +388,9 @@ class Scenario:
             num_hiatus=exp_data.get('num_hiatus', 3),
             hiatus_placement=exp_data.get('hiatus_placement', 'random'),
             blocking_window=exp_data.get('blocking_window', 3),
+            use_predictive_adversary=exp_data.get('use_predictive_adversary', False),
+            predictive_history_size=exp_data.get('predictive_history_size', 5),
+            predictive_training_ratio=exp_data.get('predictive_training_ratio', 0.7),
             output_dir=exp_data.get('output_dir', 'data/results'),
             seed=exp_data.get('seed'),
         )

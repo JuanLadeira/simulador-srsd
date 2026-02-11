@@ -183,6 +183,9 @@ adversary_test:
     srsd_k_paths: 5
     srsd_recurrence_penalty: 3.0
     srsd_temperature: 0.8
+    use_predictive_adversary: true
+    predictive_history_size: 5
+    predictive_training_ratio: 0.7
     output_dir: data/results
 
 # Scenario 7: Burst traffic pattern
