@@ -1714,6 +1714,15 @@ wheels = [
 ]
 
 [[package]]
+name = "simpy"
+version = "4.1.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/a8/66/860505ec021a16f9d8cf4b8c4d60ee07bb427649b643312303698c93b551/simpy-4.1.1.tar.gz", hash = "sha256:06d0750a7884b11e0e8e20ce0bc7c6d4ed5f1743d456695340d13fdff95001a6", size = 408997, upload-time = "2023-11-13T03:39:04.909Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/48/72/920ed1224c94a8a5a69e6c1275ac7fe4eb911ba8feffddf469f1629d47f3/simpy-4.1.1-py3-none-any.whl", hash = "sha256:7c5ae380240fd2238671160e4830956f8055830a8317edf5c05e495b3823cd88", size = 27224, upload-time = "2023-11-13T03:39:03.362Z" },
+]
+
+[[package]]
 name = "simulador-srsd"
 version = "0.1.0"
 source = { editable = "." }
@@ -1725,6 +1734,7 @@ dependencies = [
     { name = "pyvis" },
     { name = "pyyaml" },
     { name = "seaborn" },
+    { name = "simpy" },
     { name = "streamlit" },
 ]
 
@@ -1736,6 +1746,12 @@ dev = [
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "taskipy" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "pytest" },
+    { name = "pytest-cov" },
 ]
 
 [package.metadata]
@@ -1752,10 +1768,17 @@ requires-dist = [
     { name = "pyvis", specifier = ">=0.3.2" },
     { name = "pyyaml", specifier = ">=6.0" },
     { name = "seaborn", specifier = ">=0.12.0" },
+    { name = "simpy", specifier = ">=4.1.1" },
     { name = "streamlit", specifier = ">=1.54.0" },
     { name = "taskipy", marker = "extra == 'dev'", specifier = ">=1.12.0" },
 ]
 provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "pytest", specifier = ">=9.0.2" },
+    { name = "pytest-cov", specifier = ">=7.0.0" },
+]
 
 [[package]]
 name = "six"
