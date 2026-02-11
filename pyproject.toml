@@ -38,37 +38,37 @@ build-backend = "setuptools.build_meta"
 # ============================================
 # EXECUÇÃO
 # ============================================
-demo = "python main.py --demo"
-run = "python main.py"
-list = "python main.py --list"
-validate = "python main.py --validate"
-all = "python main.py --all"
+demo = "uv run python main.py --demo"
+run = "uv run python main.py"
+list = "uv run python main.py --list"
+validate = "uv run python main.py --validate"
+all = "uv run python main.py --all"
 
 # Cenários específicos
-scenario = "python main.py --scenario"
-small = "python main.py --scenario small_mesh"
-medium = "python main.py --scenario medium_scalefree"
-large = "python main.py --scenario large_scale"
-qkd = "python main.py --scenario qkd_network"
-adversary = "python main.py --scenario adversary_test"
+scenario = "uv run python main.py --scenario"
+small = "uv run python main.py --scenario small_mesh"
+medium = "uv run python main.py --scenario medium_scalefree"
+large = "uv run python main.py --scenario large_scale"
+qkd = "uv run python main.py --scenario qkd_network"
+adversary = "uv run python main.py --scenario adversary_test"
 
 # ============================================
 # TESTES
 # ============================================
-test = "pytest tests/ -v"
-test-cov = "pytest tests/ --cov=src --cov-report=html --cov-report=term"
-test-core = "pytest tests/test_core.py -v"
-test-routing = "pytest tests/test_routing.py -v"
-test-adversary = "pytest tests/test_adversary.py -v"
-test-simulation = "pytest tests/test_simulation.py -v"
-test-fast = "pytest tests/ -v -x --tb=short"
+test = "uv run pytest tests/ -v"
+test-cov = "uv run pytest tests/ --cov=src --cov-report=html --cov-report=term"
+test-core = "uv run pytest tests/test_core.py -v"
+test-routing = "uv run pytest tests/test_routing.py -v"
+test-adversary = "uv run pytest tests/test_adversary.py -v"
+test-simulation = "uv run pytest tests/test_simulation.py -v"
+test-fast = "uv run pytest tests/ -v -x --tb=short"
 
 # ============================================
 # QUALIDADE DE CÓDIGO
 # ============================================
-fmt = "black src/ tests/ main.py && isort src/ tests/ main.py"
-check = "black --check src/ tests/ main.py && isort --check src/ tests/ main.py"
-lint = "mypy src/ --ignore-missing-imports"
+fmt = "uv run black src/ tests/ main.py && uv run isort src/ tests/ main.py"
+check = "uv run black --check src/ tests/ main.py && uv run isort --check src/ tests/ main.py"
+lint = "uv run mypy src/ --ignore-missing-imports"
 
 # ============================================
 # LIMPEZA
