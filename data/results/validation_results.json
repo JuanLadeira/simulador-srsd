@@ -1,0 +1,34 @@
+{
+  "overall_status": "partially_validated",
+  "summary": "Hypotheses partially validated. Results support SRSD effectiveness with some limitations.",
+  "h1": {
+    "status": "partially_validated",
+    "message": "H1 weakly supported: Only 1/3 criteria met.",
+    "baseline_entropy": 5.424445313242925,
+    "srsd_entropy": 6.009923604009827,
+    "entropy_improvement": 0.5854782907669014,
+    "baseline_correlation": 0.0,
+    "srsd_correlation": 0.0,
+    "correlation_reduction": 0.0,
+    "evidence": {
+      "low_baseline_entropy": false,
+      "entropy_improved": true,
+      "significant_improvement": false
+    }
+  },
+  "h2": {
+    "status": "validated",
+    "message": "H2 validated: SRSD maintains acceptable performance (latency overhead: -30.9%, success rate: 100.0%).",
+    "latency_overhead_pct": -30.933657939159108,
+    "success_rate_baseline": 1.0,
+    "success_rate_srsd": 1.0,
+    "correlation_reduction_pct": 0.0,
+    "entropy_improvement_pct": 0.0,
+    "qkd_integration_success": false,
+    "evidence": {
+      "latency_acceptable": true,
+      "success_rate_maintained": true,
+      "no_significant_degradation": true
+    }
+  }
+}

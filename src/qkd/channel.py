@@ -144,8 +144,19 @@ class QKDChannel:
         """
         Calculate risk level for this channel (0-1).
 
+        DEPRECATED: Per SRSD specification, QKD should NOT influence routing.
+        This method is kept for backward compatibility but should not be used
+        for routing decisions.
+
         Higher risk = less desirable for routing.
         """
+        import warnings
+        warnings.warn(
+            "get_risk_level() is deprecated. QKD should not influence routing decisions.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+
         risk = 0.0
 
         # QBER contribution (higher QBER = higher risk)
@@ -161,6 +172,38 @@ class QKDChannel:
         risk += state_risk.get(self.state, 0.5) * 0.4
 
         # Availability contribution
+        risk += (1 - self.metrics.uptime_ratio) * 0.2
+
+        return min(1.0, risk)
+
+    def has_keys(self, amount: float = 1.0) -> bool:
+        """
+        Check if sufficient key material is available.
+
+        This is the proper way to query QKD status - checking key availability
+        rather than using risk for routing decisions.
+
+        Args:
+            amount: Amount of key material needed (bits)
+
+        Returns:
+            True if sufficient keys are available
+        """
+        return self.metrics.available_keys >= amount
+
+    def _get_risk_level_internal(self) -> float:
+        """Internal method for risk calculation without deprecation warning."""
+        risk = 0.0
+
+        risk += min(1.0, self.metrics.qber / 0.11) * 0.4
+
+        state_risk = {
+            ChannelState.ACTIVE: 0.0,
+            ChannelState.DEGRADED: 0.3,
+            ChannelState.INTERRUPTED: 0.8,
+            ChannelState.FAILED: 1.0,
+        }
+        risk += state_risk.get(self.state, 0.5) * 0.4
         risk += (1 - self.metrics.uptime_ratio) * 0.2
 
         return min(1.0, risk)
@@ -252,12 +295,72 @@ class QKDChannelManager:
         """
         Get risk level for a channel.
 
+        DEPRECATED: Per SRSD specification, QKD should NOT influence routing.
+        This method is kept for backward compatibility but should not be used
+        for routing decisions.
+
         Returns 1.0 (maximum risk) if no QKD channel exists.
         """
+        import warnings
+        warnings.warn(
+            "get_channel_risk() is deprecated. QKD should not influence routing decisions.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+
         channel = self.get_channel(source, target)
         if channel is None:
             return 1.0
-        return channel.get_risk_level()
+
+        # Call internal method to avoid double warning
+        return channel._get_risk_level_internal()
+
+    def has_keys(self, source: str, target: str, amount: float = 1.0) -> bool:
+        """
+        Check if QKD keys are available for a channel.
+
+        This is the proper way to query QKD status - checking key availability
+        rather than using risk for routing decisions.
+
+        Args:
+            source: Source node ID
+            target: Target node ID
+            amount: Amount of key material needed (bits)
+
+        Returns:
+            True if sufficient keys are available
+        """
+        channel = self.get_channel(source, target)
+        if channel is None:
+            return False
+        return channel.has_keys(amount)
+
+    def get_key(self, source: str, target: str, amount: float = 1.0) -> Optional[bytes]:
+        """
+        Get QKD key material for encryption.
+
+        This is the proper way to use QKD - obtaining keys for encryption,
+        independent of routing decisions.
+
+        Args:
+            source: Source node ID
+            target: Target node ID
+            amount: Amount of key material needed (bits)
+
+        Returns:
+            Key material as bytes, or None if insufficient keys
+        """
+        channel = self.get_channel(source, target)
+        if channel is None:
+            return None
+
+        if channel.consume_keys(amount):
+            # In a real implementation, this would return actual key material
+            # Here we return placeholder bytes
+            import os
+            return os.urandom(int(amount / 8))
+
+        return None
 
     def get_node_channels(self, node_id: str) -> List[QKDChannel]:
         """Get all channels connected to a node."""

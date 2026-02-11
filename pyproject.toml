@@ -14,6 +14,9 @@ dependencies = [
     "PyYAML>=6.0",
     "matplotlib>=3.7.0",
     "seaborn>=0.12.0",
+    "streamlit>=1.54.0",
+    "pyvis>=0.3.2",
+    "simpy>=4.1.1",
 ]
 
 [project.optional-dependencies]
@@ -111,4 +114,10 @@ exclude_lines = [
     "pragma: no cover",
     "def __repr__",
     "raise NotImplementedError",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
 ]

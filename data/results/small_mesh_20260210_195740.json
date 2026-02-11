@@ -1,0 +1,63 @@
+{
+  "scenario_name": "small_mesh",
+  "timestamp": "2026-02-10T19:57:40.538231",
+  "duration": 0.022754907608032227,
+  "results": {
+    "baseline": {
+      "algorithm": "baseline",
+      "total_time": 0.0029718875885009766,
+      "successful_flows": 100,
+      "failed_flows": 0,
+      "avg_latency": 2.04,
+      "avg_hops": 2.04,
+      "path_entropy": 5.543465189601652,
+      "unique_paths": 53,
+      "adversary_correlation": 0.0,
+      "adversary_identification": 0.0
+    },
+    "srsd": {
+      "algorithm": "srsd",
+      "total_time": 0.019010305404663086,
+      "successful_flows": 100,
+      "failed_flows": 0,
+      "avg_latency": 0.022480352479017248,
+      "avg_hops": 33.29,
+      "path_entropy": 6.6438561897747395,
+      "unique_paths": 100,
+      "adversary_correlation": 0.0,
+      "adversary_identification": 0.0
+    }
+  },
+  "comparison": {
+    "baseline_vs_srsd": {
+      "entropy_improvement_pct": 19.850237397308533,
+      "diversity_improvement_pct": 88.67924528301887,
+      "latency_overhead_pct": -98.89802193730307,
+      "baseline_entropy": 5.543465189601652,
+      "srsd_entropy": 6.6438561897747395,
+      "baseline_unique_paths": 53,
+      "srsd_unique_paths": 100
+    },
+    "adversary": {
+      "correlation": {
+        "baseline_accuracy": 0.47,
+        "srsd_accuracy": 0.47,
+        "improvement": 0.0
+      },
+      "fingerprinting": {
+        "baseline_identification_rate": 0.76,
+        "srsd_identification_rate": 0.08,
+        "improvement": 0.68
+      },
+      "predictability": {
+        "baseline_entropy": 0.0,
+        "srsd_entropy": 1.333782758819629,
+        "entropy_improvement": 1.333782758819629,
+        "baseline_recurrence": 1.0,
+        "srsd_recurrence": 0.4109195402298851,
+        "recurrence_reduction": 0.5890804597701149
+      }
+    }
+  },
+  "data_files": {}
+}

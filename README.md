@@ -19,17 +19,30 @@ simulador/
 │   ├── qkd/            # Abstração de canais QKD
 │   ├── simulation/     # Framework de simulação
 │   └── analysis/       # Análise comparativa e validação
+├── frontend/           # Interface web Streamlit
+│   ├── simulation.py   # Wrapper de simulação com cache
+│   └── ui_components.py # Componentes de visualização
 ├── tests/              # Testes automatizados
 ├── data/
 │   ├── topologies/     # Topologias de rede
 │   └── results/        # Resultados dos experimentos
 ├── config/
 │   └── scenarios.yaml  # Configuração de cenários
-├── main.py             # Ponto de entrada
+├── app.py              # Dashboard web Streamlit
+├── main.py             # Ponto de entrada CLI
 └── requirements.txt    # Dependências
 ```
 
 ## Instalação
+
+### Com uv (recomendado)
+
+```bash
+# Instalar dependências
+uv sync
+```
+
+### Com pip
 
 ```bash
 # Criar ambiente virtual
@@ -59,6 +72,48 @@ python main.py --all
 
 # Validar hipóteses com resultados existentes
 python main.py --validate
+```
+
+## Dashboard Web
+
+O simulador inclui uma interface web interativa construída com Streamlit.
+
+### Executar o Dashboard
+
+```bash
+streamlit run app.py
+```
+
+O dashboard estará disponível em `http://localhost:8501`.
+
+### Funcionalidades
+
+- **Seleção de Cenário**: Escolha entre os cenários pré-configurados
+- **Parâmetros Ajustáveis**: Modifique número de fluxos e nós Hiatus
+- **Execução com Cache**: Resultados são cacheados para execuções repetidas
+- **Visualizações**:
+  - **Resumo Comparativo**: Métricas KPI comparando Baseline vs SRSD
+  - **Métricas Detalhadas**: Tabelas completas por algoritmo
+  - **Visualização da Rede**: Grafo interativo da topologia (pyvis)
+  - **Análise do Adversário**: Métricas de segurança e correlação
+
+### Screenshot
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  SRSD Network Routing Simulator                             │
+├──────────────┬──────────────────────────────────────────────┤
+│ Configuracao │  [Resumo] [Métricas] [Rede] [Adversário]     │
+│              │                                              │
+│ Cenário:     │  Melhora de    Overhead de    Melhora de     │
+│ [small_mesh] │  Entropia      Latência       Diversidade    │
+│              │  +45.2%        +12.3%         +200%          │
+│ Parâmetros:  │                                              │
+│ Fluxos: 500  │  ┌─────────────────────────────────────┐     │
+│ Hiatus: 3    │  │     Detalhes da Comparação         │     │
+│              │  │     Baseline vs SRSD               │     │
+│ [Executar]   │  └─────────────────────────────────────┘     │
+└──────────────┴──────────────────────────────────────────────┘
 ```
 
 ## Cenários Disponíveis

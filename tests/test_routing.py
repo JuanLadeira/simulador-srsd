@@ -138,8 +138,8 @@ class TestSRSDRouter:
         for i in range(50):
             baseline_router.route("n_0_0", "n_3_3", flow_id=f"baseline_{i}")
 
-        # SRSD
-        config = SRSDConfig(k_paths=5, recurrence_penalty=2.0)
+        # SRSD (legacy mode for comparison)
+        config = SRSDConfig(k_paths=5, recurrence_penalty=2.0, use_distributed=False)
         srsd_router = SRSDRouter(mesh_graph, config)
         srsd_router.set_seed(42)
         for i in range(50):
@@ -153,8 +153,8 @@ class TestSRSDRouter:
         assert srsd_paths >= baseline_paths
 
     def test_srsd_memory(self, mesh_graph):
-        """Test SRSD route memory."""
-        config = SRSDConfig(k_paths=3)
+        """Test SRSD route memory (legacy mode only)."""
+        config = SRSDConfig(k_paths=3, use_distributed=False)
         router = SRSDRouter(mesh_graph, config)
         router.set_seed(42)
 

@@ -1,0 +1,70 @@
+{
+  "metadata": {
+    "scenario_name": "small_mesh",
+    "timestamp": "2026-02-11T00:29:47.828451",
+    "filename": "small_mesh_20260211_002947.json"
+  },
+  "results": {
+    "scenario_name": "small_mesh",
+    "timestamp": "2026-02-11T00:29:47.625826",
+    "duration": 0.20191073417663574,
+    "results": {
+      "baseline": {
+        "algorithm": "baseline",
+        "total_time": 0.009951114654541016,
+        "successful_flows": 500,
+        "failed_flows": 0,
+        "avg_latency": 2.726,
+        "avg_hops": 2.726,
+        "path_entropy": 7.5059925000603815,
+        "unique_paths": 211,
+        "adversary_correlation": 0.0,
+        "adversary_identification": 0.0
+      },
+      "srsd": {
+        "algorithm": "srsd",
+        "total_time": 0.19071173667907715,
+        "successful_flows": 4,
+        "failed_flows": 496,
+        "avg_latency": 0.09652882435960738,
+        "avg_hops": 82.0,
+        "path_entropy": 2.0,
+        "unique_paths": 4,
+        "adversary_correlation": 0.0,
+        "adversary_identification": 0.0
+      }
+    },
+    "comparison": {
+      "baseline_vs_srsd": {
+        "entropy_improvement_pct": -73.35462298977902,
+        "diversity_improvement_pct": -98.10426540284361,
+        "latency_overhead_pct": -96.45895728688161,
+        "baseline_entropy": 7.5059925000603815,
+        "srsd_entropy": 2.0,
+        "baseline_unique_paths": 211,
+        "srsd_unique_paths": 4
+      },
+      "adversary": {
+        "correlation": {
+          "baseline_accuracy": 0.578,
+          "srsd_accuracy": 0.0,
+          "improvement": 0.578
+        },
+        "fingerprinting": {
+          "baseline_identification_rate": 0.866,
+          "srsd_identification_rate": 0.0,
+          "improvement": 0.866
+        },
+        "predictability": {
+          "baseline_entropy": 0.0,
+          "srsd_entropy": 0.0,
+          "entropy_improvement": 0.0,
+          "baseline_recurrence": 1.0,
+          "srsd_recurrence": 0.0,
+          "recurrence_reduction": 1.0
+        }
+      }
+    },
+    "data_files": {}
+  }
+}

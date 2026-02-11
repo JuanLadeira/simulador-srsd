@@ -7,14 +7,19 @@ local state for routing decisions.
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Dict, List, Optional, Set
+from typing import TYPE_CHECKING, Dict, List, Optional, Set
 import time
+
+if TYPE_CHECKING:
+    from .drawer import Drawer
+    from .hiatus import HiatusController
 
 
 class NodeType(Enum):
     """Types of network nodes."""
     ENDPOINT = "endpoint"       # Source/destination nodes
     ROUTER = "router"           # Standard forwarding node
+    HIATUS = "hiatus"           # CAR - structural discontinuity point
     QKD_ENABLED = "qkd_enabled"  # Node with QKD capability
 
 
@@ -109,6 +114,10 @@ class Node:
     # Local routing state
     routing_table: Dict[str, str] = field(default_factory=dict)
 
+    # SRSD components (initialized separately)
+    drawer: Optional['Drawer'] = None
+    hiatus_controller: Optional['HiatusController'] = None
+
     def is_active(self) -> bool:
         """Check if node is operational."""
         return self.state == NodeState.ACTIVE
@@ -116,6 +125,43 @@ class Node:
     def is_qkd_capable(self) -> bool:
         """Check if node has QKD capability."""
         return self.node_type == NodeType.QKD_ENABLED
+
+    def is_hiatus(self) -> bool:
+        """Check if node is a Hiatus (CAR) point."""
+        return self.node_type == NodeType.HIATUS
+
+    def initialize_drawer(self, neighbors: List[str],
+                          blocking_window: int = 3,
+                          seed: Optional[int] = None) -> None:
+        """
+        Initialize the Drawer for this node.
+
+        Args:
+            neighbors: List of direct neighbor node IDs
+            blocking_window: Number of selections before automatic unblock
+            seed: Random seed for reproducibility
+        """
+        from .drawer import Drawer
+        self.drawer = Drawer(self.id, neighbors, blocking_window, seed)
+
+    def initialize_hiatus_controller(self,
+                                      mixing_delay_mean: float = 0.01,
+                                      mixing_delay_std: float = 0.005,
+                                      seed: Optional[int] = None) -> None:
+        """
+        Initialize the HiatusController for this node.
+
+        Only meaningful if node_type is HIATUS.
+
+        Args:
+            mixing_delay_mean: Mean mixing delay in seconds
+            mixing_delay_std: Standard deviation of mixing delay
+            seed: Random seed for reproducibility
+        """
+        from .hiatus import HiatusController
+        self.hiatus_controller = HiatusController(
+            self.id, mixing_delay_mean, mixing_delay_std, seed
+        )
 
     def add_outgoing_edge(self, edge_id: str) -> None:
         """Register an outgoing edge."""

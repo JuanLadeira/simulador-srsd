@@ -1,11 +1,11 @@
 """
-Runner - Executes simulation experiments.
+Runner - Executes simulation experiments using SimPy discrete event simulation.
 
 Orchestrates the simulation by:
-- Setting up the environment
-- Running routing algorithms
-- Collecting metrics
-- Managing timing
+- Setting up the SimPy environment
+- Running routing algorithms with realistic timing
+- Collecting metrics based on simulation time
+- Managing packet transmission as processes
 """
 
 from dataclasses import dataclass, field
@@ -14,6 +14,8 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 import time
 import json
+
+import simpy
 
 from ..core.graph import NetworkGraph
 from ..routing.baseline import BaselineRouter, FlowRecord
@@ -45,6 +47,9 @@ class RunResult:
     adversary_correlation: float = 0.0
     adversary_identification: float = 0.0
 
+    # SimPy metrics
+    simulation_time: float = 0.0
+
     def to_dict(self) -> dict:
         """Serialize to dictionary."""
         return {
@@ -58,6 +63,7 @@ class RunResult:
             'unique_paths': self.unique_paths,
             'adversary_correlation': self.adversary_correlation,
             'adversary_identification': self.adversary_identification,
+            'simulation_time': self.simulation_time,
         }
 
 
@@ -104,12 +110,12 @@ class ExperimentResult:
 
 class SimulationRunner:
     """
-    Executes simulation experiments.
+    Executes simulation experiments using SimPy discrete event simulation.
 
     Handles:
-    - Environment setup
-    - Algorithm execution
-    - Metrics collection
+    - SimPy environment setup
+    - Algorithm execution with realistic timing
+    - Metrics collection based on simulation time
     - Result aggregation
     """
 
@@ -156,9 +162,16 @@ class SimulationRunner:
 
         if self.scenario.experiment.test_srsd:
             config = SRSDConfig(
+                # Legacy mode parameters
                 k_paths=self.scenario.experiment.srsd_k_paths,
                 recurrence_penalty=self.scenario.experiment.srsd_recurrence_penalty,
                 selection_temperature=self.scenario.experiment.srsd_temperature,
+                # Distributed mode parameters
+                use_distributed=self.scenario.experiment.use_distributed_srsd,
+                num_hiatus=self.scenario.experiment.num_hiatus,
+                hiatus_placement=self.scenario.experiment.hiatus_placement,
+                blocking_window=self.scenario.experiment.blocking_window,
+                seed=self.scenario.experiment.seed,
             )
             self.srsd_router = SRSDRouter(self.graph, config)
             if self.scenario.experiment.seed:
@@ -172,7 +185,11 @@ class SimulationRunner:
             config = SRSDConfig(
                 k_paths=self.scenario.experiment.srsd_k_paths,
                 recurrence_penalty=self.scenario.experiment.srsd_recurrence_penalty,
-                use_qkd_indicators=True,
+                use_distributed=self.scenario.experiment.use_distributed_srsd,
+                num_hiatus=self.scenario.experiment.num_hiatus,
+                hiatus_placement=self.scenario.experiment.hiatus_placement,
+                blocking_window=self.scenario.experiment.blocking_window,
+                seed=self.scenario.experiment.seed,
             )
             self.qkd_srsd_router = QKDIntegratedSRSDRouter(
                 self.graph, config, self.qkd_manager
@@ -270,36 +287,88 @@ class SimulationRunner:
         return result
 
     def _run_algorithm(self, name: str, router) -> RunResult:
-        """Run a single routing algorithm."""
-        flows = []
+        """
+        Run a single routing algorithm using SimPy discrete event simulation.
+
+        Args:
+            name: Algorithm name
+            router: Router instance to use
+
+        Returns:
+            RunResult with metrics based on simulation time
+        """
         start_time = time.time()
 
-        # Calculate timing
-        num_flows = len(self.traffic_pairs)
+        # Create SimPy environment
+        env = simpy.Environment()
+
+        # Shared state for collecting results
+        flows: List[FlowRecord] = []
+        failed_count = [0]  # Use list for mutability in nested function
+
+        # Calculate flow generation interval
         flow_interval = 1.0 / self.scenario.traffic.flow_rate
 
-        simulation_time = 0.0
+        def packet_journey(env: simpy.Environment, flow_id: str,
+                          src: str, dst: str, start_sim_time: float):
+            """
+            SimPy process representing a packet's journey through the network.
 
-        for i, (src, dst) in enumerate(self.traffic_pairs):
-            flow_id = f"{name}_flow_{i}"
-
-            # Route the flow
+            Each hop consumes time based on edge latency.
+            """
+            # Get route from router (instantaneous decision)
             flow = router.route(src, dst, flow_id)
 
-            if flow:
-                flows.append(flow)
+            if flow is None:
+                failed_count[0] += 1
+                return
 
-                # Record observation for adversary
-                self.observer.observe_flow(flow)
+            # Simulate hop-by-hop transmission
+            path = flow.path
+            total_latency = 0.0
 
-            # Advance simulation time
-            simulation_time += flow_interval
+            for i in range(len(path) - 1):
+                edge = self.graph.get_edge_between(path[i], path[i + 1])
+                if edge:
+                    hop_latency = edge.attributes.latency
+                    yield env.timeout(hop_latency)
+                    total_latency += hop_latency
+
+            # Update flow with simulation-based latency
+            flow.latency = total_latency
+
+            # Record observation for adversary
+            self.observer.observe_flow(flow)
+
+            flows.append(flow)
+
+        def packet_generator(env: simpy.Environment):
+            """
+            SimPy process that generates packets at the defined flow rate.
+            """
+            for i, (src, dst) in enumerate(self.traffic_pairs):
+                flow_id = f"{name}_flow_{i}"
+                start_sim_time = env.now
+
+                # Start packet journey as a separate process
+                env.process(packet_journey(env, flow_id, src, dst, start_sim_time))
+
+                # Wait before generating next packet
+                yield env.timeout(flow_interval)
+
+        # Start the packet generator process
+        env.process(packet_generator(env))
+
+        # Run simulation
+        env.run()
 
         total_time = time.time() - start_time
+        simulation_time = env.now
 
         # Calculate metrics
+        num_flows = len(self.traffic_pairs)
         successful = len(flows)
-        failed = num_flows - successful
+        failed = failed_count[0]
 
         avg_latency = sum(f.latency for f in flows) / successful if successful else 0.0
         avg_hops = sum(f.hops for f in flows) / successful if successful else 0.0
@@ -319,6 +388,7 @@ class SimulationRunner:
             avg_hops=avg_hops,
             path_entropy=path_entropy,
             unique_paths=stats.unique_paths,
+            simulation_time=simulation_time,
         )
 
     def _calculate_comparison(self, result: ExperimentResult) -> Dict:
@@ -364,6 +434,8 @@ class SimulationRunner:
                 'srsd_entropy': srsd.path_entropy,
                 'baseline_unique_paths': baseline.unique_paths,
                 'srsd_unique_paths': srsd.unique_paths,
+                'baseline_simulation_time': baseline.simulation_time,
+                'srsd_simulation_time': srsd.simulation_time,
             }
 
             # Get adversary comparison
