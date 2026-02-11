@@ -17,6 +17,7 @@ dependencies = [
     "streamlit>=1.54.0",
     "pyvis>=0.3.2",
     "simpy>=4.1.1",
+    "scikit-learn>=1.8.0",
 ]
 
 [project.optional-dependencies]

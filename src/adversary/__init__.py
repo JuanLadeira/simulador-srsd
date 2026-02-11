@@ -17,6 +17,11 @@ from .metrics import (
     calculate_flow_identification_rate,
     calculate_adversary_advantage,
 )
+from .predictive import (
+    PredictiveAdversary,
+    PredictiveAdversaryMetrics,
+    PredictionResult,
+)
 
 __all__ = [
     'Observation',
@@ -32,4 +37,7 @@ __all__ = [
     'calculate_recurrence_rate',
     'calculate_flow_identification_rate',
     'calculate_adversary_advantage',
+    'PredictiveAdversary',
+    'PredictiveAdversaryMetrics',
+    'PredictionResult',
 ]

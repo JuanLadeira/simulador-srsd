@@ -22,6 +22,7 @@ from ..routing.baseline import BaselineRouter, FlowRecord
 from ..routing.srsd import SRSDRouter, SRSDConfig, QKDIntegratedSRSDRouter
 from ..adversary.observer import StructuralObserver
 from ..adversary.metrics import AdversaryCapabilityMetrics
+from ..adversary.predictive import PredictiveAdversary
 from ..qkd.channel import QKDChannelManager
 from .scenario import Scenario
 from .collector import MetricsCollector
@@ -143,6 +144,7 @@ class SimulationRunner:
         # Observation and metrics
         self.observer: Optional[StructuralObserver] = None
         self.adversary_metrics: Optional[AdversaryCapabilityMetrics] = None
+        self.predictive_adversary: Optional[PredictiveAdversary] = None
         self.collector: Optional[MetricsCollector] = None
 
         # State
@@ -199,6 +201,15 @@ class SimulationRunner:
         self.observer = StructuralObserver(self.graph)
         self.adversary_metrics = AdversaryCapabilityMetrics(self.graph)
         self.collector = MetricsCollector()
+
+        # Initialize predictive adversary if enabled
+        if self.scenario.experiment.use_predictive_adversary:
+            self.predictive_adversary = PredictiveAdversary(
+                self.graph,
+                history_size=self.scenario.experiment.predictive_history_size,
+                training_ratio=self.scenario.experiment.predictive_training_ratio,
+                random_state=self.scenario.experiment.seed or 42,
+            )
 
         self._is_initialized = True
 
@@ -278,6 +289,10 @@ class SimulationRunner:
         # Calculate comparative metrics
         result.comparison = self._calculate_comparison(result)
 
+        # Run predictive adversary evaluation if enabled
+        if self.predictive_adversary:
+            self._run_predictive_adversary(result)
+
         # Run post-hooks
         for hook in self.scenario.post_run_hooks:
             hook(self, result)
@@ -285,6 +300,56 @@ class SimulationRunner:
         result.duration = time.time() - start_time
 
         return result
+
+    def _run_predictive_adversary(self, result: ExperimentResult) -> None:
+        """
+        Train and evaluate predictive adversary on collected flows.
+
+        Args:
+            result: Experiment result to add predictive metrics to
+        """
+        if not self.predictive_adversary:
+            return
+
+        predictive_results = {}
+
+        # Evaluate on baseline flows
+        if 'baseline' in result.results:
+            baseline_flows = result.results['baseline'].flows
+            for flow in baseline_flows:
+                self.predictive_adversary.observe_flow(flow)
+
+            self.predictive_adversary.train()
+            baseline_metrics = self.predictive_adversary.evaluate()
+            predictive_results['baseline'] = baseline_metrics.to_dict()
+
+            # Reset for SRSD evaluation
+            self.predictive_adversary.reset()
+
+        # Evaluate on SRSD flows
+        if 'srsd' in result.results:
+            srsd_flows = result.results['srsd'].flows
+            for flow in srsd_flows:
+                self.predictive_adversary.observe_flow(flow)
+
+            self.predictive_adversary.train()
+            srsd_metrics = self.predictive_adversary.evaluate()
+            predictive_results['srsd'] = srsd_metrics.to_dict()
+
+        # Add to comparison
+        if 'baseline' in predictive_results and 'srsd' in predictive_results:
+            baseline_acc = predictive_results['baseline']['accuracy']
+            srsd_acc = predictive_results['srsd']['accuracy']
+
+            result.comparison['predictive_adversary'] = {
+                'baseline_accuracy': baseline_acc,
+                'srsd_accuracy': srsd_acc,
+                'accuracy_reduction': baseline_acc - srsd_acc,
+                'baseline_hop_accuracy': predictive_results['baseline']['hop_accuracy'],
+                'srsd_hop_accuracy': predictive_results['srsd']['hop_accuracy'],
+            }
+
+        result.comparison['predictive_adversary_details'] = predictive_results
 
     def _run_algorithm(self, name: str, router) -> RunResult:
         """
